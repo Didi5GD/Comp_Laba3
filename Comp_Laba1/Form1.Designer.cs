@@ -1,4 +1,6 @@
-﻿namespace Comp_Laba1
+﻿using System.Windows.Forms;
+
+namespace Comp_Laba1
 {
     partial class Form1
     {
@@ -74,13 +76,13 @@
             this.оПрограммеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.menuStrip3 = new System.Windows.Forms.MenuStrip();
-            this.file1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.richTextBox2 = new System.Windows.Forms.RichTextBox();
             this.Usl_code = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Type_lecsem = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Lecsema = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Place = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.menuStrip3 = new System.Windows.Forms.MenuStrip();
+            this.file1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.richTextBox2 = new System.Windows.Forms.RichTextBox();
             this.menuStrip1.SuspendLayout();
             this.menuStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -181,6 +183,7 @@
             this.пToolStripMenuItem7.Name = "пToolStripMenuItem7";
             this.пToolStripMenuItem7.Size = new System.Drawing.Size(44, 34);
             this.пToolStripMenuItem7.ToolTipText = "Пуск";
+            this.пToolStripMenuItem7.Click += new System.EventHandler(this.пToolStripMenuItem7_Click);
             // 
             // пToolStripMenuItem8
             // 
@@ -421,6 +424,7 @@
             this.пускToolStripMenuItem1.Name = "пускToolStripMenuItem1";
             this.пускToolStripMenuItem1.Size = new System.Drawing.Size(66, 26);
             this.пускToolStripMenuItem1.Text = "Пуск";
+            this.пускToolStripMenuItem1.Click += new System.EventHandler(this.пускToolStripMenuItem1_Click);
             // 
             // справкаToolStripMenuItem1
             // 
@@ -451,7 +455,7 @@
             this.richTextBox1.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.richTextBox1.Location = new System.Drawing.Point(50, 95);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(908, 324);
+            this.richTextBox1.Size = new System.Drawing.Size(908, 240);
             this.richTextBox1.TabIndex = 3;
             this.richTextBox1.Text = "";
             this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
@@ -467,14 +471,42 @@
             this.Lecsema,
             this.Place});
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dataGridView1.Enabled = false;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 419);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 335);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(958, 116);
+            this.dataGridView1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.dataGridView1.Size = new System.Drawing.Size(958, 200);
             this.dataGridView1.TabIndex = 4;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            // 
+            // Usl_code
+            // 
+            this.Usl_code.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Usl_code.HeaderText = "Условный код";
+            this.Usl_code.MinimumWidth = 6;
+            this.Usl_code.Name = "Usl_code";
+            // 
+            // Type_lecsem
+            // 
+            this.Type_lecsem.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Type_lecsem.HeaderText = "Тип лексемы";
+            this.Type_lecsem.MinimumWidth = 6;
+            this.Type_lecsem.Name = "Type_lecsem";
+            // 
+            // Lecsema
+            // 
+            this.Lecsema.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Lecsema.HeaderText = "Лексема";
+            this.Lecsema.MinimumWidth = 6;
+            this.Lecsema.Name = "Lecsema";
+            // 
+            // Place
+            // 
+            this.Place.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Place.HeaderText = "Местоположение";
+            this.Place.MinimumWidth = 6;
+            this.Place.Name = "Place";
             // 
             // menuStrip3
             // 
@@ -503,41 +535,11 @@
             this.richTextBox2.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.richTextBox2.Location = new System.Drawing.Point(0, 95);
             this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.Size = new System.Drawing.Size(50, 324);
+            this.richTextBox2.Size = new System.Drawing.Size(50, 240);
             this.richTextBox2.TabIndex = 6;
             this.richTextBox2.Text = "";
             this.richTextBox2.WordWrap = false;
             this.richTextBox2.TextChanged += new System.EventHandler(this.richTextBox2_TextChanged);
-            // 
-            // Usl_code
-            // 
-            this.Usl_code.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Usl_code.HeaderText = "Условный код";
-            this.Usl_code.MinimumWidth = 6;
-            this.Usl_code.Name = "Usl_code";
-            this.Usl_code.ReadOnly = true;
-            // 
-            // Type_lecsem
-            // 
-            this.Type_lecsem.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Type_lecsem.HeaderText = "Тип лексемы";
-            this.Type_lecsem.MinimumWidth = 6;
-            this.Type_lecsem.Name = "Type_lecsem";
-            // 
-            // Lecsema
-            // 
-            this.Lecsema.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Lecsema.HeaderText = "Лексема";
-            this.Lecsema.MinimumWidth = 6;
-            this.Lecsema.Name = "Lecsema";
-            this.Lecsema.ReadOnly = true;
-            // 
-            // Place
-            // 
-            this.Place.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Place.HeaderText = "Местоположение";
-            this.Place.MinimumWidth = 6;
-            this.Place.Name = "Place";
             // 
             // Form1
             // 
@@ -617,10 +619,10 @@
         private System.Windows.Forms.ToolStripMenuItem увеличитьToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem уменьшитьToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem сброситьToolStripMenuItem;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Usl_code;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Type_lecsem;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Lecsema;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Place;
+        private DataGridViewTextBoxColumn Usl_code;
+        private DataGridViewTextBoxColumn Type_lecsem;
+        private DataGridViewTextBoxColumn Lecsema;
+        private DataGridViewTextBoxColumn Place;
     }
 }
 

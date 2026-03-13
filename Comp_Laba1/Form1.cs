@@ -34,6 +34,8 @@ namespace Comp_Laba1
             this.AllowDrop = true;
             this.DragEnter += Form1_DragEnter;
             this.DragDrop += Form1_DragDrop;
+            dataGridView1.ScrollBars = ScrollBars.Vertical;
+
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -197,6 +199,7 @@ namespace Comp_Laba1
         private void SwitchToDocument(DocumentTab doc)
         {
             if (doc == null) return;
+            dataGridView1.Rows.Clear();
             if (currentDocument != null)
             {
                 currentDocument.TextContent = richTextBox1.Text;
@@ -423,8 +426,49 @@ namespace Comp_Laba1
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+           
+            if (e.RowIndex < 0) return;
 
+            try
+            {
+                string place = dataGridView1.Rows[e.RowIndex].Cells["Place"].Value?.ToString();
+
+                if (string.IsNullOrEmpty(place)) return;
+                var match = System.Text.RegularExpressions.Regex.Match(place, @"\((\d+),(\d+)\)");
+                if (match.Success)
+                {
+                    int lineNumber = int.Parse(match.Groups[1].Value);
+                    HighlightLine(lineNumber);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при переходе: {ex.Message}");
+            }
         }
+
+        private void HighlightLine(int lineNumber)
+        {
+            if (richTextBox1 == null || richTextBox1.Lines.Length == 0) return;
+            string[] lines = richTextBox1.Lines;
+            if (lineNumber < 1 || lineNumber > lines.Length) return;
+            int startPos = 0;
+            for (int i = 0; i < lineNumber - 1; i++)
+            {
+                startPos += lines[i].Length + 1;
+            }
+
+            int lineLength = lines[lineNumber - 1].Length;
+            int endPos = startPos + lineLength;
+            richTextBox1.Focus();
+            richTextBox1.SelectAll();
+            richTextBox1.SelectionBackColor = Color.White;
+            richTextBox1.Select(startPos, lineLength);
+            richTextBox1.SelectionBackColor = Color.LightCoral;
+            richTextBox1.ScrollToCaret();
+            richTextBox1.Select(startPos, 0);
+        }
+
 
         private void файлToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -577,6 +621,67 @@ namespace Comp_Laba1
         {
             string url = "https://docs.google.com/document/d/1Rzmagq5oPo1kBg_uRBE7TA7xVFDxVzWDO_y2QE76Ows/edit?usp=sharing";
             System.Diagnostics.Process.Start(url);
+        }
+
+        private void пToolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+            Scanner scanner = new Scanner();
+            string inputText = richTextBox1.Text;
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                MessageBox.Show("Введите текст для анализа!", "Предупреждение",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            List<ScanTokin> result = scanner.Analyze(inputText);
+            dataGridView1.Rows.Clear();
+            DisplayTokens(result);
+            dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+
+
+        }
+
+
+        public void DisplayTokens(List<ScanTokin> tokens)
+        {
+            dataGridView1.Rows.Clear();
+            var errors = tokens.Where(t => t.Type == "ERROR").ToList();
+            var tokensToDisplay = errors.Any() ? errors : tokens;
+            foreach (var token in tokensToDisplay)
+            {
+                int rowIndex = dataGridView1.Rows.Add();
+                dataGridView1.Rows[rowIndex].Cells["Place"].Value = token.Place;
+                dataGridView1.Rows[rowIndex].Cells["Type_lecsem"].Value = token.Type;
+                dataGridView1.Rows[rowIndex].Cells["Lecsema"].Value = token.Lecsema;
+                dataGridView1.Rows[rowIndex].Cells["Usl_code"].Value = token.Usl_code;
+                if (token.Type == "ERROR")
+                {
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightCoral;
+                }
+            }
+
+            string message = errors.Any()
+                ? $"Найдено ошибок: {errors.Count}. Показаны только ошибки."
+                : $"Ошибок не найдено. Всего токенов: {tokens.Count}";
+
+            MessageBox.Show(message, "Результат анализа", MessageBoxButtons.OK,
+                            errors.Any() ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+        }
+
+        private void пускToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Scanner scanner = new Scanner();
+            string inputText = richTextBox1.Text;
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                MessageBox.Show("Введите текст для анализа!", "Предупреждение",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            List<ScanTokin> result = scanner.Analyze(inputText);
+            dataGridView1.Rows.Clear();
+            DisplayTokens(result);
+            dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
     }
 }
