@@ -87,7 +87,9 @@
     <Compile Include="Form2.Designer.cs">
       <DependentUpon>Form2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Lexer.cs" />
     <Compile Include="LineNumberManager.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="RichTextBoxEditOperations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

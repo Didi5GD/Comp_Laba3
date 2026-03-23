@@ -12,6 +12,27 @@ namespace Comp_Laba1
         public string Type { get; set; }
         public string Lecsema { get; set; }
         public string Place {  get; set; }
+
+        public int Line
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Place)) return 1;
+                var parts = Place.Trim('(', ')').Split(',');
+                return int.Parse(parts[0]);
+            }
+        }
+
+        public int Column
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Place)) return 1;
+                var parts = Place.Trim('(', ')').Split(',');
+                return int.Parse(parts[1]);
+            }
+        }
+
     }
 
     public class Scanner
@@ -48,7 +69,9 @@ namespace Comp_Laba1
             { "GREATEREQ", 21 },
             { "SEMICOLON", 22 },
             { "MULTIPLY", 23 },
-            { "POWER", 24 }
+            { "POWER", 24 },
+            { "OR", 25 },
+            { "AND", 26 }
         };
 
             public Scanner()
@@ -136,7 +159,15 @@ namespace Comp_Laba1
                             AddToken("POWER", "**", startLine, startColumn);
                             Advance(); Advance();
                             return true;
-                    }
+                        case "||":
+                             AddToken("OR", "||", startLine, startColumn);
+                             Advance(); Advance();
+                             return true;
+                        case "&&":
+                            AddToken("AND", "&&", startLine, startColumn);
+                             Advance(); Advance();
+                             return true;
+                }
                 }
 
                 char first = input[pos];

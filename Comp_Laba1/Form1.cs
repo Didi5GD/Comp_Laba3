@@ -19,6 +19,9 @@ namespace Comp_Laba1
         int nextNewFileNumber = 2;
         private RichTextBoxEditOperations editOps;
         private LineNumberManager lineNumberManager;
+        List<ScanTokin> result_lecs;
+        List<SyntaxError> result_parser;
+
 
         public Form1()
         {
@@ -35,6 +38,7 @@ namespace Comp_Laba1
             this.DragEnter += Form1_DragEnter;
             this.DragDrop += Form1_DragDrop;
             dataGridView1.ScrollBars = ScrollBars.Vertical;
+            dataGridView1.CellClick += dataGridView1_CellClick;
 
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -200,6 +204,8 @@ namespace Comp_Laba1
         {
             if (doc == null) return;
             dataGridView1.Rows.Clear();
+            result_lecs.Clear();
+            result_parser.Clear();
             if (currentDocument != null)
             {
                 currentDocument.TextContent = richTextBox1.Text;
@@ -427,6 +433,10 @@ namespace Comp_Laba1
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
            
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
             if (e.RowIndex < 0) return;
 
             try
@@ -450,8 +460,12 @@ namespace Comp_Laba1
         private void HighlightLine(int lineNumber)
         {
             if (richTextBox1 == null || richTextBox1.Lines.Length == 0) return;
+
             string[] lines = richTextBox1.Lines;
             if (lineNumber < 1 || lineNumber > lines.Length) return;
+            richTextBox1.SelectAll();
+            richTextBox1.SelectionBackColor = Color.White;
+            richTextBox1.SelectionColor = Color.Black;
             int startPos = 0;
             for (int i = 0; i < lineNumber - 1; i++)
             {
@@ -461,8 +475,6 @@ namespace Comp_Laba1
             int lineLength = lines[lineNumber - 1].Length;
             int endPos = startPos + lineLength;
             richTextBox1.Focus();
-            richTextBox1.SelectAll();
-            richTextBox1.SelectionBackColor = Color.White;
             richTextBox1.Select(startPos, lineLength);
             richTextBox1.SelectionBackColor = Color.LightCoral;
             richTextBox1.ScrollToCaret();
@@ -633,11 +645,14 @@ namespace Comp_Laba1
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            List<ScanTokin> result = scanner.Analyze(inputText);
-            dataGridView1.Rows.Clear();
-            DisplayTokens(result);
+            result_lecs = scanner.Analyze(inputText);
+            ShowTokensTable();
             dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
+            Parser parser = new Parser(result_lecs);
+            parser.ParseStart();
+            result_parser = parser.GetErrors();
+            int errorCount = parser.ErrorCount;
 
         }
 
@@ -646,8 +661,7 @@ namespace Comp_Laba1
         {
             dataGridView1.Rows.Clear();
             var errors = tokens.Where(t => t.Type == "ERROR").ToList();
-            var tokensToDisplay = errors.Any() ? errors : tokens;
-            foreach (var token in tokensToDisplay)
+            foreach (var token in tokens)
             {
                 int rowIndex = dataGridView1.Rows.Add();
                 dataGridView1.Rows[rowIndex].Cells["Place"].Value = token.Place;
@@ -661,7 +675,7 @@ namespace Comp_Laba1
             }
 
             string message = errors.Any()
-                ? $"Найдено ошибок: {errors.Count}. Показаны только ошибки."
+                ? $"Найдено ошибок: {errors.Count}."
                 : $"Ошибок не найдено. Всего токенов: {tokens.Count}";
 
             MessageBox.Show(message, "Результат анализа", MessageBoxButtons.OK,
@@ -682,6 +696,119 @@ namespace Comp_Laba1
             dataGridView1.Rows.Clear();
             DisplayTokens(result);
             dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+
+        }
+
+        private void лексемыToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowTokensTable();
+            ClearHighlight();
+        }
+
+        private void парсерToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowErrorsTable();
+            ClearHighlight();
+        }
+
+        private void ShowTokensTable()
+        {
+            if (result_lecs == null || result_lecs.Count == 0)
+            {
+                MessageBox.Show("Нет данных о лексемах. Сначала выполните анализ.",
+                    "Нет данных", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            dataGridView1.Rows.Clear();
+            dataGridView1.Columns.Clear();
+
+            dataGridView1.Columns.Add("UslCode", "Код");
+            dataGridView1.Columns.Add("Type", "Тип");
+            dataGridView1.Columns.Add("Lecsema", "Лексема");
+            dataGridView1.Columns.Add("Place", "Позиция");
+
+            dataGridView1.Columns["UslCode"].Width = 80;
+            dataGridView1.Columns["Type"].Width = 120;
+            dataGridView1.Columns["Lecsema"].Width = 150;
+            dataGridView1.Columns["Place"].Width = 100;
+
+            foreach (var token in result_lecs)
+            {
+                int rowIndex = dataGridView1.Rows.Add(
+                    token.Usl_code,
+                    token.Type,
+                    token.Lecsema,
+                    token.Place
+                );
+
+                if (token.Type == "ERROR")
+                {
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = System.Drawing.Color.LightCoral;
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.ForeColor = System.Drawing.Color.DarkRed;
+                }
+                else if (token.Type == "error")
+                {
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.BackColor = System.Drawing.Color.LightCoral;
+                    dataGridView1.Rows[rowIndex].DefaultCellStyle.ForeColor = System.Drawing.Color.DarkRed;
+                }
+                
+            }
+
+            лексемыToolStripMenuItem.BackColor = System.Drawing.Color.LightBlue;
+            парсерToolStripMenuItem.BackColor = System.Drawing.Color.LightCoral;
+            dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+        }
+
+        private void ShowErrorsTable()
+        {
+            if (result_parser == null || result_parser.Count == 0)
+            {
+              
+                    MessageBox.Show("Нет данных об ошибках. Сначала выполните анализ.",
+                        "Нет данных", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            dataGridView1.Rows.Clear();
+            dataGridView1.Columns.Clear();
+            dataGridView1.Columns.Add("Fragment", "Неверный фрагмент");
+            dataGridView1.Columns.Add("Place", "Местоположение");
+            dataGridView1.Columns.Add("Description", "Описание ошибки");
+            dataGridView1.Columns["Fragment"].Width = 200;
+            dataGridView1.Columns["Place"].Width = 120;
+            dataGridView1.Columns["Description"].Width = 800;
+
+            foreach (var error in result_parser)
+            {
+                dataGridView1.Rows.Add(
+                    error.Fragment,
+                    error.Location,
+                    error.Description
+                );
+            }
+
+            парсерToolStripMenuItem.BackColor = System.Drawing.Color.LightBlue;
+            лексемыToolStripMenuItem.BackColor = System.Drawing.Color.LightCoral;
+            dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+        }
+
+        private void ClearHighlight()
+        {
+            if (richTextBox1 == null) return;
+
+            try
+            {
+                richTextBox1.SelectAll();
+                richTextBox1.SelectionBackColor = Color.White;
+                richTextBox1.SelectionColor = Color.Black;
+                richTextBox1.Select(0, 0);
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка сброса подсветки: {ex.Message}");
+            }
         }
     }
 }
