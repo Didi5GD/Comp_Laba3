@@ -204,8 +204,9 @@ namespace Comp_Laba1
         {
             if (doc == null) return;
             dataGridView1.Rows.Clear();
-            result_lecs.Clear();
-            result_parser.Clear();
+            if(result_lecs!=null)
+            { result_lecs.Clear(); }
+            if (result_parser != null) {  result_parser.Clear(); }
             if (currentDocument != null)
             {
                 currentDocument.TextContent = richTextBox1.Text;
