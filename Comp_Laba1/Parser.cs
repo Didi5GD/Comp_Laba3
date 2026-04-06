@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Comp_Laba1
 {
@@ -18,19 +16,10 @@ namespace Comp_Laba1
         private List<ScanTokin> _tokens;
         private int _position;
         private ScanTokin _current;
+        private ScanTokin _previous;
+
         private List<SyntaxError> _errors;
         private int _errorCount;
-
-        private enum RecoveryState
-        {
-            Normal,
-            SkipToSemicolon,
-            SkipToCloseBrace,
-            SkipToRParen,
-            SkipToNextKeyword
-        }
-
-        private RecoveryState _recoveryState;
 
         private const string IDENTIFIER = "IDENTIFIER";
         private const string IF = "IF";
@@ -59,12 +48,7 @@ namespace Comp_Laba1
             _position = 0;
             _errors = new List<SyntaxError>();
             _errorCount = 0;
-            _recoveryState = RecoveryState.Normal;
-
-            if (_tokens.Count > 0)
-                _current = _tokens[0];
-            else
-                _current = null;
+            SkipErrorTokens();
         }
 
         public List<SyntaxError> GetErrors() => _errors;
@@ -72,50 +56,39 @@ namespace Comp_Laba1
 
         private void Advance()
         {
+            _previous = _current;
             _position++;
-            if (_position < _tokens.Count)
-                _current = _tokens[_position];
-            else
-                _current = null;
+            SkipErrorTokens();
+        }
+
+        private void SkipErrorTokens()
+        {
+            while (_position < _tokens.Count && _tokens[_position].Type == ERROR)
+                _position++;
+
+            _current = _position < _tokens.Count ? _tokens[_position] : null;
         }
 
         private bool IsEnd() => _current == null;
 
-        private string GetCurrentPlace()
-        {
-            return _current != null ? _current.Place : "(?, ?)";
-        }
+        private string GetCurrentPlace() => _current?.Place ?? "(?, ?)";
+        private string GetCurrentValue() => _current?.Lecsema ?? "EOF";
+        private string GetPreviousValue() => _previous?.Lecsema ?? "";
 
-        private string GetCurrentValue()
+        private bool Match(string type)
         {
-            return _current != null ? _current.Lecsema : "EOF";
-        }
-
-        private string GetCurrentType()
-        {
-            return _current != null ? _current.Type : "EOF";
-        }
-
-        private bool Match(string expectedType)
-        {
-            if (IsEnd()) return false;
-
-            if (_current.Type == expectedType)
+            if (!IsEnd() && _current.Type == type)
             {
                 Advance();
                 return true;
             }
-
             return false;
         }
 
         private void AddError(string fragment, string description)
         {
             string location = GetCurrentPlace();
-
-            bool duplicate = _errors.Any(e => e.Location == location && e.Description == description);
-
-            if (!duplicate)
+            if (!_errors.Any(e => e.Location == location && e.Description == description))
             {
                 _errors.Add(new SyntaxError
                 {
@@ -124,414 +97,209 @@ namespace Comp_Laba1
                     Description = description
                 });
                 _errorCount++;
-
-                System.Diagnostics.Debug.WriteLine($"ОШИБКА: {fragment} | {location} | {description}");
             }
         }
-
-        private void SkipErrorTokens()
-        {
-            while (!IsEnd() && _current.Type == ERROR)
-            {
-                AddError($"Недопустимая лексема '{_current.Lecsema}'", "Недопустимый символ в коде");
-                Advance();
-            }
-        }
-
-        private void Recover(RecoveryState targetState)
-        {
-            _recoveryState = targetState;
-            int startPos = _position;
-
-            while (!IsEnd())
-            {
-                switch (targetState)
-                {
-                    case RecoveryState.SkipToSemicolon:
-                        if (_current.Type == SEMICOLON)
-                        {
-                            Advance();
-                            _recoveryState = RecoveryState.Normal;
-                            return;
-                        }
-                        break;
-
-                    case RecoveryState.SkipToCloseBrace:
-                        if (_current.Type == RBRACE)
-                        {
-                            _recoveryState = RecoveryState.Normal;
-                            return;
-                        }
-                        break;
-
-                    case RecoveryState.SkipToRParen:
-                        if (_current.Type == RPAREN)
-                        {
-                            Advance();
-                            _recoveryState = RecoveryState.Normal;
-                            return;
-                        }
-                        break;
-
-                    case RecoveryState.SkipToNextKeyword:
-                        if (_current.Type == IF || _current.Type == ELSE || _current.Type == RBRACE)
-                        {
-                            _recoveryState = RecoveryState.Normal;
-                            return;
-                        }
-                        break;
-                }
-                Advance();
-            }
-
-            _recoveryState = RecoveryState.Normal;
-        }
-
 
         public void ParseStart()
         {
-            if (_recoveryState != RecoveryState.Normal) return;
+            if (IsEnd()) return;
 
-            System.Diagnostics.Debug.WriteLine("=== НАЧАЛО РАЗБОРА ===");
-
-            SkipErrorTokens();
-
-            if (IsEnd())
-            {
-                return;
-            }
-
+            // if
             if (!Match(IF))
-            {
-                AddError(GetCurrentValue(), "Ожидается 'if' в начале конструкции");
-                Recover(RecoveryState.SkipToNextKeyword);
-                return;
-            }
+                AddError(GetCurrentValue(), "Отсутствует 'if'");
 
-            ParseCondition();
-            ParseBlock();
-            ParseElsePart();
-            ParseEndSemi();
-
-            SkipErrorTokens();
-
-            if (!IsEnd())
-            {
-                if (_current.Type == SEMICOLON)
-                {
-                    AddError(GetCurrentValue(), "Лишняя точка с запятой после завершения конструкции");
-                    Advance();
-                }
-                else if (_current.Type == RBRACE)
-                {
-                    AddError(GetCurrentValue(), "Лишняя закрывающая скобка");
-                    Advance();
-                }
-                else if (_current.Type == ERROR)
-                {
-                    AddError($"Недопустимая лексема '{_current.Lecsema}'", "Недопустимый символ в коде");
-                    Advance();
-                }
-                else
-                {
-                    AddError(GetCurrentValue(), "Лишние символы после завершения конструкции");
-                    while (!IsEnd())
-                    {
-                        Advance();
-                    }
-                }
-            }
-
-            System.Diagnostics.Debug.WriteLine("=== КОНЕЦ РАЗБОРА ===");
-        }
-
-        private void ParseCondition()
-        {
-            if (_recoveryState != RecoveryState.Normal) return;
-
+            // (
             if (!Match(LPAREN))
-            {
-                AddError(GetCurrentValue(), "Ожидается '(' после if");
-                Recover(RecoveryState.SkipToRParen);
-                return;
-            }
+                AddError(GetCurrentValue(), "Ожидается '('");
 
             ParseExpr();
 
+            // )
             if (!Match(RPAREN))
-            {
                 AddError(GetCurrentValue(), "Ожидается ')'");
-                Recover(RecoveryState.SkipToSemicolon);
+
+            // тело if
+            ParseBody();
+
+            // else
+            if (!IsEnd() && _current.Type == ELSE)
+            {
+                Advance();
+                ParseBody();
+            }
+
+            // ; допустим
+            if (!IsEnd() && _current.Type == SEMICOLON)
+                Advance();
+
+            if (!IsEnd())
+                AddError(GetCurrentValue(), "Неожиданный токен");
+        }
+
+        private void ParseBody()
+        {
+            if (Match(LBRACE))
+            {
+                ParseStatementList();
+
+                if (!Match(RBRACE))
+                    AddError(GetCurrentValue(), "Ожидается '}'");
+            }
+            else
+            {
+                AddError(GetPreviousValue(), "Ожидается '{'");
+                ParseStatement();
             }
         }
 
         private void ParseExpr()
         {
-            if (_recoveryState != RecoveryState.Normal) return;
-
             ParseLogicTerm();
 
             while (!IsEnd() && _current.Type == OR)
             {
                 Advance();
+
+                if (_current.Type == OR)
+                    AddError("||", "Два оператора подряд");
+
                 ParseLogicTerm();
             }
         }
 
         private void ParseLogicTerm()
         {
-            if (_recoveryState != RecoveryState.Normal) return;
-
             ParseCompare();
 
             while (!IsEnd() && _current.Type == AND)
             {
                 Advance();
+
+                if (_current.Type == AND)
+                    AddError("&&", "Два оператора подряд");
+
                 ParseCompare();
             }
         }
 
         private void ParseCompare()
         {
-            if (_recoveryState != RecoveryState.Normal) return;
-
             if (!IsEnd() && _current.Type == LPAREN)
             {
                 Advance();
                 ParseExpr();
+
                 if (!Match(RPAREN))
-                {
-                    AddError(GetCurrentValue(), "Ожидается ')'");
-                    Recover(RecoveryState.SkipToRParen);
-                }
+                    AddError(GetCurrentValue(), "Не закрыта ')'");
                 return;
             }
 
-            int savePos = _position;
-            ScanTokin saveCurrent = _current;
-            int saveErrorCount = _errorCount;
+            ParseValue();
 
-            try
+            if (!IsEnd() && IsRelOp())
             {
-                ParseValue();
+                string op = _current.Lecsema;
+                Advance();
 
-                if (!IsEnd() && IsRelOp())
+                if (IsEnd() || _current.Type != IDENTIFIER)
                 {
-                    ParseRelOp();
-                    ParseValue();
+                    AddError(op, "После оператора сравнения ожидается переменная");
                     return;
                 }
-            }
-            catch
-            {
-                _position = savePos;
-                _current = saveCurrent;
-                _errorCount = saveErrorCount;
-                while (_errors.Count > saveErrorCount)
-                {
-                    _errors.RemoveAt(_errors.Count - 1);
-                }
-            }
 
-            AddError(GetCurrentValue(), "Ожидается оператор сравнения (>, <, >=, <=, ==, !=)");
-            Recover(RecoveryState.SkipToSemicolon);
+                ParseValue();
+            }
         }
 
         private bool IsRelOp()
         {
-            if (IsEnd()) return false;
             string[] ops = { LESS, LESSEQ, GREATER, GREATEREQ, EQUAL, NEQUAL };
-            return ops.Contains(_current.Type);
-        }
-
-        private void ParseRelOp()
-        {
-            if (_recoveryState != RecoveryState.Normal) return;
-
-            string[] ops = { LESS, LESSEQ, GREATER, GREATEREQ, EQUAL, NEQUAL };
-            if (ops.Contains(_current?.Type ?? ""))
-            {
-                Advance();
-            }
-            else
-            {
-                AddError(GetCurrentValue(), "Ожидается оператор сравнения");
-                Recover(RecoveryState.SkipToSemicolon);
-            }
+            return !IsEnd() && ops.Contains(_current.Type);
         }
 
         private void ParseValue()
         {
-            if (_recoveryState != RecoveryState.Normal) return;
-
-            if (!Match(IDENTIFIER))
+            if (IsEnd())
             {
-                AddError(GetCurrentValue(), "Ожидается переменная (например, $a)");
-                Recover(RecoveryState.SkipToSemicolon);
+                AddError("EOF", "Ожидается переменная");
+                return;
+            }
+
+            if (_current.Type == IDENTIFIER)
+            {
+                if (!_current.Lecsema.StartsWith("$"))
+                    AddError(_current.Lecsema, "Переменная должна начинаться с '$'");
+
+                Advance();
+            }
+            else
+            {
+                AddError(GetCurrentValue(), "Ожидается переменная");
+                Advance();
             }
         }
 
-        
-
         private void ParseStatementList()
         {
-            if (_recoveryState != RecoveryState.Normal) return;
-
-            while (!IsEnd() && IsStartOfStatement())
+            while (!IsEnd() && (_current.Type == IDENTIFIER || _current.Type == SEMICOLON))
             {
+                if (_current.Type == SEMICOLON)
+                {
+                    AddError(";", "Лишний ';'");
+                    Advance();
+                    continue;
+                }
+
                 ParseStatement();
             }
         }
 
-        private bool IsStartOfStatement()
-        {
-            return !IsEnd() && _current.Type == IDENTIFIER;
-        }
-
         private void ParseStatement()
         {
-            if (_recoveryState != RecoveryState.Normal) return;
-
-            int savePos = _position;
-            ScanTokin saveCurrent = _current;
-            int saveErrorCount = _errorCount;
-
-            try
-            {
-                ParseValue();
-                ParseOp();
-                ParseVar();
-
-                if (!Match(SEMICOLON))
-                {
-                    string errorPlace = GetCurrentPlace();
-                    string errorValue = GetCurrentValue();
-
-                    AddError(errorValue, "Ожидается ';' в конце оператора");
-
-                    while (!IsEnd() && _current.Type != SEMICOLON && _current.Type != RBRACE)
-                    {
-                        Advance();
-                    }
-
-                    if (!IsEnd() && _current.Type == SEMICOLON)
-                    {
-                        Advance();
-                    }
-                }
-            }
-            catch
-            {
-                _position = savePos;
-                _current = saveCurrent;
-                _errorCount = saveErrorCount;
-                while (_errors.Count > saveErrorCount)
-                {
-                    _errors.RemoveAt(_errors.Count - 1);
-                }
-
-                AddError(GetCurrentValue(), "Некорректный оператор");
-                Recover(RecoveryState.SkipToSemicolon);
-            }
-        }
-
-        private void ParseOp()
-        {
-            if (_recoveryState != RecoveryState.Normal) return;
-
-            if (Match(ASSIGN) || Match(INCREMENT) || Match(DECREMENT))
-            {
-                return;
-            }
-
-            AddError(GetCurrentValue(), "Ожидается оператор (=, ++, --)");
-            Recover(RecoveryState.SkipToSemicolon);
-        }
-
-        private void ParseVar()
-        {
-            if (_recoveryState != RecoveryState.Normal) return;
-
+            // переменная
             if (!IsEnd() && _current.Type == IDENTIFIER)
             {
+                if (!_current.Lecsema.StartsWith("$"))
+                    AddError(_current.Lecsema, "Переменная должна начинаться с '$'");
+
                 Advance();
             }
-        }
-
-        private void ParseElsePart()
-        {
-            if (_recoveryState != RecoveryState.Normal) return;
-
-            if (!IsEnd() && _current.Type == ELSE)
+            else
             {
+                AddError(GetCurrentValue(), "Ожидается переменная");
                 Advance();
-                ParseElseBlock();
-            }
-        }
-
-        private void ParseBlock()
-        {
-            if (_recoveryState != RecoveryState.Normal) return;
-
-            if (!Match(LBRACE))
-            {
-                AddError(GetCurrentValue(), "Ожидается '{'");
-                Recover(RecoveryState.SkipToCloseBrace);
                 return;
             }
 
-            ParseStatementList();
-
-            if (!Match(RBRACE))
+            // оператор
+            if (Match(ASSIGN))
             {
-                AddError(GetCurrentValue(), "Ожидается '}'");
-                while (!IsEnd() && _current.Type != RBRACE)
+                // нужен RHS
+                if (!IsEnd() && _current.Type == IDENTIFIER)
                 {
+                    if (!_current.Lecsema.StartsWith("$"))
+                        AddError(_current.Lecsema, "Некорректное имя переменной");
+
                     Advance();
                 }
-                if (!IsEnd() && _current.Type == RBRACE)
+                else
                 {
-                    Advance();
-                }
-            }
-        }
-
-        private void ParseElseBlock()
-        {
-            if (_recoveryState != RecoveryState.Normal) return;
-
-            if (!Match(LBRACE))
-            {
-                AddError(GetCurrentValue(), "Ожидается '{' после else");
-                return;
-            }
-
-            ParseStatementList();
-
-            if (!Match(RBRACE))
-            {
-                AddError(GetCurrentValue(), "Ожидается '}'");
-                while (!IsEnd() && _current.Type != RBRACE)
-                {
-                    Advance();
-                }
-                if (!IsEnd() && _current.Type == RBRACE)
-                {
+                    AddError(GetCurrentValue(), "Ожидается значение");
                     Advance();
                 }
             }
-        }
-
-        private void ParseEndSemi()
-        {
-            if (_recoveryState != RecoveryState.Normal) return;
-
-            if (!IsEnd() && _current.Type == SEMICOLON)
+            else if (Match(INCREMENT) || Match(DECREMENT))
             {
-                Advance();
+                // OK
             }
+            else
+            {
+                AddError(GetCurrentValue(), "Ожидается оператор (=, ++, --)");
+            }
+
+            // ;
+            if (!Match(SEMICOLON))
+                AddError(GetCurrentValue(), "Ожидается ';'");
         }
     }
-
-
 }

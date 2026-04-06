@@ -428,7 +428,17 @@ namespace Comp_Laba1
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
-
+            if (currentDocument != null)
+            {
+                currentDocument.TextContent = richTextBox1.Text;
+                currentDocument.IsModified = true;
+                string title = $"Редактор - {currentDocument.FileName}";
+                if (currentDocument.IsModified)
+                {
+                    title += "*";
+                }
+                this.Text = title;
+            }
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
