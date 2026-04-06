@@ -16,10 +16,8 @@ namespace Comp_Laba1
         private List<ScanTokin> _tokens;
         private int _position;
         private ScanTokin _current;
-        private ScanTokin _previous;
 
-        private List<SyntaxError> _errors;
-        private int _errorCount;
+        private List<SyntaxError> _errors = new List<SyntaxError>();
 
         private const string IDENTIFIER = "IDENTIFIER";
         private const string IF = "IF";
@@ -46,22 +44,18 @@ namespace Comp_Laba1
         {
             _tokens = tokens;
             _position = 0;
-            _errors = new List<SyntaxError>();
-            _errorCount = 0;
-            SkipErrorTokens();
+            SkipErrors();
         }
 
         public List<SyntaxError> GetErrors() => _errors;
-        public int ErrorCount => _errorCount;
 
         private void Advance()
         {
-            _previous = _current;
             _position++;
-            SkipErrorTokens();
+            SkipErrors();
         }
 
-        private void SkipErrorTokens()
+        private void SkipErrors()
         {
             while (_position < _tokens.Count && _tokens[_position].Type == ERROR)
                 _position++;
@@ -71,13 +65,12 @@ namespace Comp_Laba1
 
         private bool IsEnd() => _current == null;
 
-        private string GetCurrentPlace() => _current?.Place ?? "(?, ?)";
-        private string GetCurrentValue() => _current?.Lecsema ?? "EOF";
-        private string GetPreviousValue() => _previous?.Lecsema ?? "";
+        private string Val() => _current?.Lecsema ?? "EOF";
+        private string Pos() => _current?.Place ?? "(?, ?)";
 
-        private bool Match(string type)
+        private bool Match(string t)
         {
-            if (!IsEnd() && _current.Type == type)
+            if (!IsEnd() && _current.Type == t)
             {
                 Advance();
                 return true;
@@ -85,55 +78,36 @@ namespace Comp_Laba1
             return false;
         }
 
-        private void AddError(string fragment, string description)
+        private void Error(string desc)
         {
-            string location = GetCurrentPlace();
-            if (!_errors.Any(e => e.Location == location && e.Description == description))
+            _errors.Add(new SyntaxError
             {
-                _errors.Add(new SyntaxError
-                {
-                    Fragment = fragment,
-                    Location = location,
-                    Description = description
-                });
-                _errorCount++;
-            }
+                Fragment = Val(),
+                Location = Pos(),
+                Description = desc
+            });
         }
 
         public void ParseStart()
         {
-            if (IsEnd()) return;
-
-            // if
             if (!Match(IF))
-                AddError(GetCurrentValue(), "Отсутствует 'if'");
+                Error("Отсутствует 'if'");
 
-            // (
             if (!Match(LPAREN))
-                AddError(GetCurrentValue(), "Ожидается '('");
+                Error("Ожидается '('");
 
             ParseExpr();
 
-            // )
             if (!Match(RPAREN))
-                AddError(GetCurrentValue(), "Ожидается ')'");
+                Error("Ожидается ')'");
 
-            // тело if
             ParseBody();
 
-            // else
-            if (!IsEnd() && _current.Type == ELSE)
-            {
-                Advance();
+            if (Match(ELSE))
                 ParseBody();
-            }
 
-            // ; допустим
-            if (!IsEnd() && _current.Type == SEMICOLON)
-                Advance();
-
-            if (!IsEnd())
-                AddError(GetCurrentValue(), "Неожиданный токен");
+            if (!Match(SEMICOLON))
+                Error("Ожидается ';' в конце конструкции");
         }
 
         private void ParseBody()
@@ -143,163 +117,100 @@ namespace Comp_Laba1
                 ParseStatementList();
 
                 if (!Match(RBRACE))
-                    AddError(GetCurrentValue(), "Ожидается '}'");
+                    Error("Ожидается '}'");
             }
             else
             {
-                AddError(GetPreviousValue(), "Ожидается '{'");
-                ParseStatement();
-            }
-        }
-
-        private void ParseExpr()
-        {
-            ParseLogicTerm();
-
-            while (!IsEnd() && _current.Type == OR)
-            {
-                Advance();
-
-                if (_current.Type == OR)
-                    AddError("||", "Два оператора подряд");
-
-                ParseLogicTerm();
-            }
-        }
-
-        private void ParseLogicTerm()
-        {
-            ParseCompare();
-
-            while (!IsEnd() && _current.Type == AND)
-            {
-                Advance();
-
-                if (_current.Type == AND)
-                    AddError("&&", "Два оператора подряд");
-
-                ParseCompare();
-            }
-        }
-
-        private void ParseCompare()
-        {
-            if (!IsEnd() && _current.Type == LPAREN)
-            {
-                Advance();
-                ParseExpr();
-
-                if (!Match(RPAREN))
-                    AddError(GetCurrentValue(), "Не закрыта ')'");
-                return;
-            }
-
-            ParseValue();
-
-            if (!IsEnd() && IsRelOp())
-            {
-                string op = _current.Lecsema;
-                Advance();
-
-                if (IsEnd() || _current.Type != IDENTIFIER)
+                Error("Ожидается '{'");
+                ParseStatement(); 
+                if (!IsEnd() && _current.Type == RBRACE)
                 {
-                    AddError(op, "После оператора сравнения ожидается переменная");
-                    return;
+                    Advance();
                 }
-
-                ParseValue();
             }
         }
 
-        private bool IsRelOp()
-        {
-            string[] ops = { LESS, LESSEQ, GREATER, GREATEREQ, EQUAL, NEQUAL };
-            return !IsEnd() && ops.Contains(_current.Type);
-        }
-
-        private void ParseValue()
-        {
-            if (IsEnd())
-            {
-                AddError("EOF", "Ожидается переменная");
-                return;
-            }
-
-            if (_current.Type == IDENTIFIER)
-            {
-                if (!_current.Lecsema.StartsWith("$"))
-                    AddError(_current.Lecsema, "Переменная должна начинаться с '$'");
-
-                Advance();
-            }
-            else
-            {
-                AddError(GetCurrentValue(), "Ожидается переменная");
-                Advance();
-            }
-        }
 
         private void ParseStatementList()
         {
-            while (!IsEnd() && (_current.Type == IDENTIFIER || _current.Type == SEMICOLON))
-            {
-                if (_current.Type == SEMICOLON)
-                {
-                    AddError(";", "Лишний ';'");
-                    Advance();
-                    continue;
-                }
+            while (!IsEnd()) { 
+
+                if (_current.Type == RBRACE)
+                    return;
 
                 ParseStatement();
+                if (_current != null && _current.Type == RBRACE)
+                    return;
             }
         }
 
         private void ParseStatement()
         {
-            // переменная
-            if (!IsEnd() && _current.Type == IDENTIFIER)
-            {
-                if (!_current.Lecsema.StartsWith("$"))
-                    AddError(_current.Lecsema, "Переменная должна начинаться с '$'");
+            if (IsEnd()) return;
 
+            if (_current.Type == IDENTIFIER)
+            {
                 Advance();
             }
             else
             {
-                AddError(GetCurrentValue(), "Ожидается переменная");
+                Error("Ожидается переменная");
                 Advance();
                 return;
             }
 
-            // оператор
             if (Match(ASSIGN))
             {
-                // нужен RHS
-                if (!IsEnd() && _current.Type == IDENTIFIER)
-                {
-                    if (!_current.Lecsema.StartsWith("$"))
-                        AddError(_current.Lecsema, "Некорректное имя переменной");
-
-                    Advance();
-                }
-                else
-                {
-                    AddError(GetCurrentValue(), "Ожидается значение");
-                    Advance();
-                }
+                if (!Match(IDENTIFIER))
+                    Error("Ожидается значение");
             }
             else if (Match(INCREMENT) || Match(DECREMENT))
             {
-                // OK
             }
             else
             {
-                AddError(GetCurrentValue(), "Ожидается оператор (=, ++, --)");
+                Error("Ожидается оператор (=, ++, --)");
             }
-
-            // ;
             if (!Match(SEMICOLON))
-                AddError(GetCurrentValue(), "Ожидается ';'");
+            {
+                Error("Ожидается ';'");
+
+                if (_current != null && _current.Type == RBRACE)
+                    return;
+
+
+                while (!IsEnd() &&
+                       _current.Type != SEMICOLON &&
+                       _current.Type != RBRACE)
+                {
+                    Advance();
+                }
+
+                Match(SEMICOLON);
+            }
+        }
+
+        private void ParseExpr()
+        {
+            ParseValue();
+
+            if (!IsEnd() && IsRel())
+            {
+                Advance();
+                ParseValue();
+            }
+        }
+
+        private bool IsRel()
+        {
+            string[] ops = { LESS, LESSEQ, GREATER, GREATEREQ, EQUAL, NEQUAL };
+            return ops.Contains(_current?.Type);
+        }
+
+        private void ParseValue()
+        {
+            if (!Match(IDENTIFIER))
+                Error("Ожидается переменная");
         }
     }
 }

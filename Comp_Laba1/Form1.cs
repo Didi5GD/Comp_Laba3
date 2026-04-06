@@ -663,7 +663,6 @@ namespace Comp_Laba1
             Parser parser = new Parser(result_lecs);
             parser.ParseStart();
             result_parser = parser.GetErrors();
-            int errorCount = parser.ErrorCount;
 
         }
 
