@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Comp_Laba1
@@ -10,9 +11,6 @@ namespace Comp_Laba1
         public string Type { get; set; }
         public string Lecsema { get; set; }
         public string Place { get; set; }
-
-        public int Line => int.Parse(Place.Trim('(', ')').Split(',')[0]);
-        public int Column => int.Parse(Place.Trim('(', ')').Split(',')[1]);
     }
 
     public class Scanner
@@ -42,10 +40,23 @@ namespace Comp_Laba1
                     else currentColumn++;
                     pos++; continue;
                 }
-                if (!TryParseLexeme()) { RecordError("Недопустимый символ " + input[pos]); Advance(); }
+
+                if (TryParseLexeme()) continue;
+
+                int errLine = currentLine;
+                int errCol = currentColumn;
+                StringBuilder garbage = new StringBuilder();
+                while (pos < input.Length && !char.IsWhiteSpace(input[pos]) && !IsPunctuation(input[pos]))
+                {
+                    garbage.Append(input[pos]);
+                    Advance();
+                }
+                RecordError(garbage.ToString(), errLine, errCol);
             }
             return tokens;
         }
+
+        private bool IsPunctuation(char c) => "=(){};><$".Contains(c);
 
         private bool TryParseLexeme()
         {
@@ -60,21 +71,46 @@ namespace Comp_Laba1
             char f = input[pos];
             if (f == '$')
             {
-                StringBuilder sb = new StringBuilder().Append(f); Advance();
-                while (pos < input.Length && char.IsLetterOrDigit(input[pos])) { sb.Append(input[pos]); Advance(); }
-                if (sb.Length > 1) AddToken("IDENTIFIER", sb.ToString(), sL, sC);
-                else RecordError("Ожидалось имя переменной после $");
+                Advance();
+                StringBuilder sb = new StringBuilder().Append(f);
+                if (pos < input.Length && char.IsLetter(input[pos]))
+                {
+                    while (pos < input.Length && char.IsLetterOrDigit(input[pos]))
+                    {
+                        sb.Append(input[pos]);
+                        Advance();
+                    }
+                    AddToken("IDENTIFIER", sb.ToString(), sL, sC);
+                }
+                else
+                {
+                    // Если после $ нет буквы, это ошибка идентификатора
+                    while (pos < input.Length && !char.IsWhiteSpace(input[pos]) && !IsPunctuation(input[pos]))
+                    {
+                        sb.Append(input[pos]);
+                        Advance();
+                    }
+                    RecordError(sb.ToString(), sL, sC);
+                }
                 return true;
             }
 
             if (char.IsLetter(f))
             {
-                StringBuilder sb = new StringBuilder();
-                while (pos < input.Length && char.IsLetter(input[pos])) { sb.Append(input[pos]); Advance(); }
-                string w = sb.ToString();
-                if (w == "if") AddToken("IF", w, sL, sC);
-                else if (w == "else") AddToken("ELSE", w, sL, sC);
-                else RecordError("Недопустимая лексема " + w);
+                int start = pos;
+                while (pos < input.Length && char.IsLetterOrDigit(input[pos])) pos++;
+                string w = input.Substring(start, pos - start);
+
+                if (w == "if" || w == "else")
+                {
+                    currentColumn += w.Length;
+                    AddToken(w.ToUpper(), w, sL, sC);
+                    return true;
+                }
+
+                // Все, что начинается с буквы, но не if/else и не имеет $, — это ERROR
+                currentColumn += w.Length;
+                RecordError(w, sL, sC);
                 return true;
             }
 
@@ -82,13 +118,16 @@ namespace Comp_Laba1
                         f == '{' ? "LBRACE" : f == '}' ? "RBRACE" : f == ';' ? "SEMICOLON" :
                         f == '>' ? "GREATER" : f == '<' ? "LESS" : null;
             if (st != null) { AddToken(st, f.ToString(), sL, sC); Advance(); return true; }
+
             return false;
         }
 
         private void Advance() { pos++; currentColumn++; }
+
         private void AddToken(string t, string l, int ln, int cl) =>
             tokens.Add(new ScanTokin { Usl_code = typeToCode.ContainsKey(t) ? typeToCode[t] : 0, Type = t, Lecsema = l, Place = $"({ln},{cl})" });
-        private void RecordError(string m) =>
-            tokens.Add(new ScanTokin { Usl_code = 0, Type = "ERROR", Lecsema = m, Place = $"({currentLine},{currentColumn})" });
+
+        private void RecordError(string lex, int ln, int cl) =>
+            tokens.Add(new ScanTokin { Usl_code = 0, Type = "ERROR", Lecsema = lex, Place = $"({ln},{cl})" });
     }
 }
