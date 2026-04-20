@@ -657,13 +657,13 @@ namespace Comp_Laba1
                 return;
             }
             result_lecs = scanner.Analyze(inputText);
-            ShowTokensTable();
+            
             dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
             Parser parser = new Parser(result_lecs);
             parser.ParseStart();
             result_parser = parser.GetErrors();
-
+            ShowErrorsTable();
         }
 
 
