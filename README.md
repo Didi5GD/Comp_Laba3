@@ -7,6 +7,12 @@
 
 Вариант задания: 94. Условный оператор if-else на языке PHP
 
+
+Контекстно-свободные грамматики (КС-грамматики) — это Тип 2 в иерархии Хомского. Они являются основой для описания синтаксиса большинства языков программирования.
+<img width="659" height="378" alt="image" src="https://github.com/user-attachments/assets/05d4badb-c987-4a3d-9e09-6f4a705c3145" />
+
+
+
 Примеры кода корректные (многострочные в том числе) 
  if ($a > $b) { $max = $a; } else { $max = $b; };
 
@@ -14,23 +20,8 @@
 if($a>$b){ $a--;} else{ $a=$b; };
 
 граматика: 
-<Start> -> 'if' <CONDITION> <BLOCK> <ELSE_PART> <END_SEMI>
-<CONDITION> -> '(' <EXPR> ')'
-<EXPR> -> <LOGIC_TERM> { '||' <LOGIC_TERM> }
- <LOGIC_TERM> -> <COMPARE> { '&&' <COMPARE> }
-<COMPARE> -> <VALUE> <REL_OP> <VALUE> | '(' <EXPR> ')'
- <VALUE> -> '$' <ID> 
- <REL_OP> -> '>' | '<' | '>=' | '<=' | '==' | '!='
- <ID> -> letter <ID_TAIL>
- <ID_TAIL> -> letter <ID_TAIL> | digit <ID_TAIL> | '_' <ID_TAIL> | ε
- <BLOCK> -> '{' <STATEMENT_LIST> '}'
- <STATEMENT_LIST> -> <STATEMENT> { <STATEMENT> }
-  <STATEMENT> -> <VALUE> <OP> <VAR> ';'
- <OP>-> ‘=’|’++’|’--’
- <VAR> -> '$' <ID> | ε
- <ELSE_PART> -> 'else' <ELSE_BLOCK> | ε
- <ELSE_BLOCK> -> '{' <STATEMENT_LIST> '}'
- <END_SEMI> -> ';'
+<img width="793" height="724" alt="image" src="https://github.com/user-attachments/assets/d40884a2-a56b-427e-9cce-ec2647ba6a6a" />
+
 
 
 V_t = { 'if', 'else', '(', ')', '{', '}', ';', '$', '=', '>', '<', '>=', '<=', '==', '!=', '||', ’++’,’--' '&&', letter, digit, '_' }
