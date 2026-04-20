@@ -122,7 +122,7 @@ namespace Comp_Laba1
             else
             {
                 Error("Ожидается '{'");
-                ParseStatement(); 
+                ParseStatement();
                 if (!IsEnd() && _current.Type == RBRACE)
                 {
                     Advance();
@@ -133,7 +133,8 @@ namespace Comp_Laba1
 
         private void ParseStatementList()
         {
-            while (!IsEnd()) { 
+            while (!IsEnd())
+            {
 
                 if (_current.Type == RBRACE)
                     return;
