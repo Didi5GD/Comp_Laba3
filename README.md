@@ -14,7 +14,7 @@
 if($a>$b){ $a--;} else{ $a=$b; };
 
 граматика: 
-1.  <Start> -> 'if' <CONDITION> <BLOCK> <ELSE_PART> <END_SEMI>
+1. <Start> -> 'if' <CONDITION> <BLOCK> <ELSE_PART> <END_SEMI>
 2.  <CONDITION> -> '(' <EXPR> ')'
 3.  <EXPR> -> <LOGIC_TERM> { '||' <LOGIC_TERM> }
 4.  <LOGIC_TERM> -> <COMPARE> { '&&' <COMPARE> }
