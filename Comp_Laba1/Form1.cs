@@ -19,7 +19,7 @@ namespace Comp_Laba1
         int nextNewFileNumber = 2;
         private RichTextBoxEditOperations editOps;
         private LineNumberManager lineNumberManager;
-        List<ScanTokin> result_lecs;
+        List<ScanToken> result_lecs;
         List<SyntaxError> result_parser;
 
 
@@ -648,26 +648,25 @@ namespace Comp_Laba1
 
         private void пToolStripMenuItem7_Click(object sender, EventArgs e)
         {
-            Scanner scanner = new Scanner();
+            LexicalAnalyzer scanner = new LexicalAnalyzer();
             string inputText = richTextBox1.Text;
-            if (string.IsNullOrWhiteSpace(inputText))
+            if (string.IsNullOrWhiteSpace(currentDocument.FilePath))
             {
                 MessageBox.Show("Введите текст для анализа!", "Предупреждение",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            result_lecs = scanner.Analyze(inputText);
+            result_lecs = scanner.AnalyzeText(currentDocument.FilePath);
             
             dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
 
             Parser parser = new Parser(result_lecs);
-            parser.ParseStart();
-            result_parser = parser.GetErrors();
+            result_parser =parser.Parse();
             ShowErrorsTable();
         }
 
 
-        public void DisplayTokens(List<ScanTokin> tokens)
+        public void DisplayTokens(List<ScanToken> tokens)
         {
             dataGridView1.Rows.Clear();
             var errors = tokens.Where(t => t.Type == "ERROR").ToList();
@@ -694,18 +693,7 @@ namespace Comp_Laba1
 
         private void пускToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            Scanner scanner = new Scanner();
-            string inputText = richTextBox1.Text;
-            if (string.IsNullOrWhiteSpace(inputText))
-            {
-                MessageBox.Show("Введите текст для анализа!", "Предупреждение",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            List<ScanTokin> result = scanner.Analyze(inputText);
-            dataGridView1.Rows.Clear();
-            DisplayTokens(result);
-            dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+            //запуск?
 
         }
 
