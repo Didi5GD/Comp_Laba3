@@ -20,43 +20,48 @@ namespace Comp_Laba1
 
         public Parser(List<ScanTokin> tokens) { _tokens = tokens; _position = 0; UpdateCurrent(); }
 
-        private void Advance() { _position++; UpdateCurrent(); }
+        private void UpdateCurrent() => _current = _position < _tokens.Count ? _tokens[_position] : null;
 
-        private void UpdateCurrent()
+        private void Advance()
         {
-            _current = _position < _tokens.Count ? _tokens[_position] : null;
+            _position++;
+            UpdateCurrent();
+            // Ключевой момент: если встретили лексическую ошибку в процессе парсинга, 
+            // просто пропускаем её как "невидимый мусор" для синтаксиса
+            while (_current != null && _current.Type == "ERROR")
+            {
+                _position++;
+                UpdateCurrent();
+            }
         }
 
         private bool Match(string t) { if (_current?.Type == t) { Advance(); return true; } return false; }
 
-        private void Expect(string type, string message)
+        private void Error(string desc)
         {
-            if (Match(type)) return;
-            Error(message);
-        }
-
-        private void Error(string desc) =>
+            if (_errors.Count > 0 && _errors.Last().Location == (_current?.Place ?? "end")) return;
             _errors.Add(new SyntaxError { Fragment = _current?.Lecsema ?? "EOF", Location = _current?.Place ?? "end", Description = desc });
+        }
 
         public List<SyntaxError> GetErrors() => _errors;
 
         public void ParseStart()
         {
-            Expect("IF", "Отсутствует 'if'");
-            Expect("LPAREN", "Ожидается '('");
+            // Обработка случая, когда код начинается с мусора перед 'if'
+            if (_current != null && _current.Type == "ERROR") Advance();
+
+            if (!Match("IF")) Error("Отсутствует 'if'");
+            if (!Match("LPAREN")) Error("Ожидается '('");
             ParseExpr();
-            Expect("RPAREN", "Ожидается ')'");
+            if (!Match("RPAREN")) Error("Ожидается ')'");
 
             ParseBody();
 
-            if (!Match("ELSE"))
-            {
-                Error("Отсутствует 'else'");
-            }
+            if (!Match("ELSE")) Error("Отсутствует 'else'");
 
             ParseBody();
 
-            Expect("SEMICOLON", "Ожидается ';' в конце конструкции");
+            if (!Match("SEMICOLON")) Error("Ожидается ';' в конце конструкции");
         }
 
         private void ParseBody()
@@ -67,16 +72,19 @@ namespace Comp_Laba1
                 {
                     ParseStatement();
                 }
-                Expect("RBRACE", "Ожидается '}'");
+                if (!Match("RBRACE")) Error("Ожидается '}'");
             }
             else
             {
-                Error("Ожидается '{'");
-                ParseStatement();
-                // Проверяем, нет ли закрывающей скобки, если она все же стоит случайно
-                if (!Match("RBRACE"))
+                // Если забыли '{', парсим одну инструкцию, но ругаемся
+                if (_current != null && _current.Type == "IDENTIFIER")
                 {
-                    Error("Ожидается '}'");
+                    Error("Ожидается '{'");
+                    ParseStatement();
+                }
+                else if (_current?.Type != "ELSE" && _current?.Type != "SEMICOLON")
+                {
+                    Error("Ожидается '{'");
                 }
             }
         }
@@ -85,38 +93,17 @@ namespace Comp_Laba1
         {
             if (_current == null || _current.Type == "RBRACE" || _current.Type == "ELSE" || _current.Type == "SEMICOLON") return;
 
-            // Если лексер пометил фрагмент как ошибку (например, $ma@@ или max)
-            if (_current.Type == "ERROR")
-            {
-                Error("Ожидается инструкция");
-                // Пропускаем все до точки с запятой, чтобы не плодить ошибки на операторах
-                while (_current != null && _current.Type != "SEMICOLON" && _current.Type != "RBRACE" && _current.Type != "ELSE")
-                {
-                    Advance();
-                }
-                Match("SEMICOLON");
-                return;
-            }
-
             if (Match("IDENTIFIER"))
             {
                 if (Match("ASSIGN"))
                 {
-                    if (_current != null && _current.Type == "ERROR")
-                    {
-                        Error("Ожидается значение");
-                        Advance();
-                    }
-                    else if (!Match("IDENTIFIER"))
-                    {
-                        Error("Ожидается значение");
-                    }
+                    ParseOperand();
                 }
                 else if (!Match("INCREMENT") && !Match("DECREMENT"))
                 {
                     Error("Ожидается оператор");
                 }
-                Expect("SEMICOLON", "Ожидается ';'");
+                if (!Match("SEMICOLON")) Error("Ожидается ';'");
             }
             else
             {
@@ -127,25 +114,18 @@ namespace Comp_Laba1
 
         private void ParseExpr()
         {
-            if (_current != null && _current.Type == "ERROR")
-            {
-                Error("Ожидается переменная");
-                Advance();
-            }
-            else if (!Match("IDENTIFIER")) Error("Ожидается переменная");
-
+            ParseOperand();
             string[] ops = { "LESS", "GREATER", "EQUAL" };
             if (_current != null && ops.Contains(_current.Type))
             {
                 Advance();
-                if (_current != null && _current.Type == "ERROR")
-                {
-                    Error("Ожидается переменная");
-                    Advance();
-                }
-                else if (!Match("IDENTIFIER")) Error("Ожидается переменная");
+                ParseOperand();
             }
         }
-    }
 
+        private void ParseOperand()
+        {
+            if (!Match("IDENTIFIER")) Error("Ожидается переменная");
+        }
+    }
 }
