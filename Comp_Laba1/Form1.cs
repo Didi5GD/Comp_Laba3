@@ -762,8 +762,9 @@ namespace Comp_Laba1
         {
             if (result_parser == null || result_parser.Count == 0)
             {
-              
-                    MessageBox.Show("Нет данных об ошибках. Сначала выполните анализ.",
+                dataGridView1.Rows.Clear();
+                dataGridView1.Columns.Clear();
+                MessageBox.Show("Нет данных об ошибках. Сначала выполните анализ.",
                         "Нет данных", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
