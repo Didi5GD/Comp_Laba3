@@ -658,7 +658,7 @@ namespace Comp_Laba1
             }
             result_lecs = scanner.AnalyzeText(currentDocument.FilePath);
             
-            dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+            
 
             Parser parser = new Parser(result_lecs);
             result_parser =parser.Parse();
@@ -693,7 +693,21 @@ namespace Comp_Laba1
 
         private void пускToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            //запуск?
+            LexicalAnalyzer scanner = new LexicalAnalyzer();
+            string inputText = richTextBox1.Text;
+            if (string.IsNullOrWhiteSpace(currentDocument.FilePath))
+            {
+                MessageBox.Show("Введите текст для анализа!", "Предупреждение",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            result_lecs = scanner.AnalyzeText(currentDocument.FilePath);
+
+
+
+            Parser parser = new Parser(result_lecs);
+            result_parser = parser.Parse();
+            ShowErrorsTable();
 
         }
 
@@ -776,7 +790,7 @@ namespace Comp_Laba1
             dataGridView1.Columns.Add("Description", "Описание ошибки");
             dataGridView1.Columns["Fragment"].Width = 200;
             dataGridView1.Columns["Place"].Width = 120;
-            dataGridView1.Columns["Description"].Width = 800;
+            dataGridView1.Columns["Description"].Width = 200;
 
             foreach (var error in result_parser)
             {
@@ -789,7 +803,7 @@ namespace Comp_Laba1
 
             парсерToolStripMenuItem.BackColor = System.Drawing.Color.LightBlue;
             лексемыToolStripMenuItem.BackColor = System.Drawing.Color.LightCoral;
-            dataGridView1.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+
         }
 
         private void ClearHighlight()
