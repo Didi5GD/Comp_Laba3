@@ -17,8 +17,6 @@
  if ($a > $b) { $max = $a; } else { $max = $b; };
 
 
-if($a>$b){ $a--;} else{ $a=$b; };
-
 граматика: 
 <img width="793" height="724" alt="image" src="https://github.com/user-attachments/assets/d40884a2-a56b-427e-9cce-ec2647ba6a6a" />
 
@@ -33,10 +31,11 @@ V_N = { <Start>, <CONDITION>, <EXPR>, <LOGIC_TERM>, <COMPARE>, <VALUE>, <LOGIC_O
 <img width="1063" height="818" alt="image" src="https://github.com/user-attachments/assets/70191a80-c131-4e34-9378-9c8c3300345b" />
 
 скрирны  
-<img width="955" height="584" alt="image" src="https://github.com/user-attachments/assets/a05a6120-95fb-4198-9ee9-54984027edab" />
-<img width="899" height="575" alt="image" src="https://github.com/user-attachments/assets/2e726a1d-5b25-487e-b012-8625d5af1011" />
+<img width="907" height="581" alt="image" src="https://github.com/user-attachments/assets/5314d766-ffdc-4e1c-9eff-a1dafa113690" />
 
-<img width="1161" height="664" alt="image" src="https://github.com/user-attachments/assets/7618d17a-9805-45e0-acee-87a39a2d2274" />
-<img width="897" height="577" alt="image" src="https://github.com/user-attachments/assets/8220526b-f85c-471a-aa57-f19cbbbbad12" />
+<img width="897" height="583" alt="image" src="https://github.com/user-attachments/assets/2c904233-e1cc-4de6-b872-c41b4217cce0" />
+
+
+
 
 
