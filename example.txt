@@ -1,4 +1,2 @@
-﻿if ($a > $b)
-{$max = $aа;}
-else
-{$max = $b; };
+﻿($a > $b) {$max = $aа;} 
+else {$max = $b;} ;
