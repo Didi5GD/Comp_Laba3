@@ -103,7 +103,8 @@ namespace Comp_Laba1
             else
             {
                 if (_errorCounter > 3) { endFlag = true; return; }
-                AddError($"После {_tokens[_currentPos - 1].Lecsema}", _tokens[_currentPos].Place, message);
+                
+                AddError($"После {_tokens[Math.Max(_currentPos - 1, 0)].Lecsema}", _tokens[_currentPos].Place, message);
                 SkipToSynchronizingToken(syncro);
                 if (SkipToToken(codes))
                 {
@@ -135,7 +136,8 @@ namespace Comp_Laba1
         {
             if (!IsValidToken())
             {
-                AddError($"Перед {(_tokens[Math.Max(_currentPos - 1, 0)]).Lecsema}", _tokens[_currentPos].Place, message);
+                //тут некорентно если ошибка в начале
+                AddError($"После {_tokens[Math.Max(_currentPos - 1, 0)].Lecsema}", _tokens[_currentPos-1].Place, message);
                 endFlag = true;
                 return;
             }
@@ -158,12 +160,7 @@ namespace Comp_Laba1
         {
             if (!IsValidToken()) return;
 
-            if (_currentToken.Usl_code != 2)
-            {
-                AddError($"Ошибочный токен в начале строки", _tokens[_currentPos].Place, "");
-                int[] collection = new int[] { 2, 11, 1 };
-                SkipToSynchronizingToken(collection);
-            }
+          
 
             int[] codes = new int[] { 2 };
             int[] syncro = new int[] { 2, 11, 1 };
@@ -265,7 +262,8 @@ namespace Comp_Laba1
             syncro = new int[] { 17 };
             ExpectToken(codes, syncro, "Ожидается ;");
 
-
+            //тут кря если несколько ошибок в хвосте он возвращается выше в функцию...
+            //если в начале нету if то 2 ошибки выдает нужную и нет
         }
     }
 

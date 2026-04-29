@@ -445,14 +445,14 @@ namespace Comp_Laba1
             // вызовСправкиToolStripMenuItem
             // 
             this.вызовСправкиToolStripMenuItem.Name = "вызовСправкиToolStripMenuItem";
-            this.вызовСправкиToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.вызовСправкиToolStripMenuItem.Size = new System.Drawing.Size(221, 26);
             this.вызовСправкиToolStripMenuItem.Text = "Вызов справки";
             this.вызовСправкиToolStripMenuItem.Click += new System.EventHandler(this.вызовСправкиToolStripMenuItem_Click);
             // 
             // оПрограммеToolStripMenuItem
             // 
             this.оПрограммеToolStripMenuItem.Name = "оПрограммеToolStripMenuItem";
-            this.оПрограммеToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.оПрограммеToolStripMenuItem.Size = new System.Drawing.Size(221, 26);
             this.оПрограммеToolStripMenuItem.Text = "О программе";
             this.оПрограммеToolStripMenuItem.Click += new System.EventHandler(this.оПрограммеToolStripMenuItem_Click);
             // 
@@ -460,9 +460,9 @@ namespace Comp_Laba1
             // 
             this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBox1.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.richTextBox1.Location = new System.Drawing.Point(50, 95);
+            this.richTextBox1.Location = new System.Drawing.Point(50, 98);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(908, 196);
+            this.richTextBox1.Size = new System.Drawing.Size(908, 193);
             this.richTextBox1.TabIndex = 3;
             this.richTextBox1.Text = "";
             this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
@@ -478,12 +478,12 @@ namespace Comp_Laba1
             this.Lecsema,
             this.Place});
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 46);
+            this.dataGridView1.Location = new System.Drawing.Point(3, 48);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dataGridView1.Size = new System.Drawing.Size(952, 195);
+            this.dataGridView1.Size = new System.Drawing.Size(952, 193);
             this.dataGridView1.TabIndex = 4;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
@@ -527,7 +527,7 @@ namespace Comp_Laba1
             this.file1ToolStripMenuItem});
             this.menuStrip3.Location = new System.Drawing.Point(0, 68);
             this.menuStrip3.Name = "menuStrip3";
-            this.menuStrip3.Size = new System.Drawing.Size(958, 27);
+            this.menuStrip3.Size = new System.Drawing.Size(958, 30);
             this.menuStrip3.TabIndex = 5;
             this.menuStrip3.Text = "menuStrip3";
             // 
@@ -535,7 +535,7 @@ namespace Comp_Laba1
             // 
             this.file1ToolStripMenuItem.Font = new System.Drawing.Font("Times New Roman", 10F);
             this.file1ToolStripMenuItem.Name = "file1ToolStripMenuItem";
-            this.file1ToolStripMenuItem.Size = new System.Drawing.Size(59, 23);
+            this.file1ToolStripMenuItem.Size = new System.Drawing.Size(59, 26);
             this.file1ToolStripMenuItem.Text = "File1";
             this.file1ToolStripMenuItem.Click += new System.EventHandler(this.file1ToolStripMenuItem_Click);
             // 
@@ -544,9 +544,9 @@ namespace Comp_Laba1
             this.richTextBox2.Dock = System.Windows.Forms.DockStyle.Left;
             this.richTextBox2.Enabled = false;
             this.richTextBox2.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.richTextBox2.Location = new System.Drawing.Point(0, 95);
+            this.richTextBox2.Location = new System.Drawing.Point(0, 98);
             this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.Size = new System.Drawing.Size(50, 196);
+            this.richTextBox2.Size = new System.Drawing.Size(50, 193);
             this.richTextBox2.TabIndex = 6;
             this.richTextBox2.Text = "";
             this.richTextBox2.WordWrap = false;
@@ -574,21 +574,21 @@ namespace Comp_Laba1
             this.парсерToolStripMenuItem});
             this.menuStrip4.Location = new System.Drawing.Point(3, 18);
             this.menuStrip4.Name = "menuStrip4";
-            this.menuStrip4.Size = new System.Drawing.Size(952, 28);
+            this.menuStrip4.Size = new System.Drawing.Size(952, 30);
             this.menuStrip4.TabIndex = 5;
             this.menuStrip4.Text = "menuStrip4";
             // 
             // лексемыToolStripMenuItem
             // 
             this.лексемыToolStripMenuItem.Name = "лексемыToolStripMenuItem";
-            this.лексемыToolStripMenuItem.Size = new System.Drawing.Size(85, 24);
+            this.лексемыToolStripMenuItem.Size = new System.Drawing.Size(85, 26);
             this.лексемыToolStripMenuItem.Text = "Лексемы";
             this.лексемыToolStripMenuItem.Click += new System.EventHandler(this.лексемыToolStripMenuItem_Click);
             // 
             // парсерToolStripMenuItem
             // 
             this.парсерToolStripMenuItem.Name = "парсерToolStripMenuItem";
-            this.парсерToolStripMenuItem.Size = new System.Drawing.Size(75, 24);
+            this.парсерToolStripMenuItem.Size = new System.Drawing.Size(75, 26);
             this.парсерToolStripMenuItem.Text = "Парсер";
             this.парсерToolStripMenuItem.Click += new System.EventHandler(this.парсерToolStripMenuItem_Click);
             // 
