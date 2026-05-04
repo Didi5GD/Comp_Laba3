@@ -1,5 +1,5 @@
-﻿if
- ($a > $b)
-{$max ss = $aа;}
+﻿
+ a > $b)
+{$max = $aа;}
 else
 {$max = $b};

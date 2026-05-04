@@ -136,7 +136,6 @@ namespace Comp_Laba1
         {
             if (!IsValidToken())
             {
-                //тут некорентно если ошибка в начале
                 AddError($"После {_tokens[Math.Max(_currentPos - 1, 0)].Lecsema}", _tokens[_currentPos-1].Place, message);
                 endFlag = true;
                 return;
@@ -262,8 +261,6 @@ namespace Comp_Laba1
             syncro = new int[] { 17 };
             ExpectToken(codes, syncro, "Ожидается ;");
 
-            //тут кря если несколько ошибок в хвосте он возвращается выше в функцию...
-            //если в начале нету if то 2 ошибки выдает нужную и нет
         }
     }
 
