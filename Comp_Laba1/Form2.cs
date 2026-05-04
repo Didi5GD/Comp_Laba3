@@ -15,11 +15,16 @@ namespace Comp_Laba1
         public Form2()
         {
             InitializeComponent();
-            label1.Text = "Лабораторная работа 1. Разработка пользовательского интерфейса (GUI) для языкового процессора. \n" +
+            label1.Text = "Курсовая работа. Условный оператор if-else на языке PHP \n" +
                 "Автор: Горащенко Дарья Романовна, факультет АВТФ,курс 3, семестр 6, группа АВТ-313.";
         }
 
         private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
         {
 
         }
