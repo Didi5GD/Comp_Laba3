@@ -475,33 +475,26 @@ namespace Comp_Laba1
 
         private void HighlightLine(int lineIdx, int startCol, int endCol)
         {
-            // Защита: индекс строки не может быть отрицательным или больше количества строк
             if (richTextBox1 == null || lineIdx < 0 || lineIdx >= richTextBox1.Lines.Length) return;
-
-            // Сброс старого выделения (чтобы не копились розовые пятна)
             int currentCaret = richTextBox1.SelectionStart;
             richTextBox1.SelectAll();
             richTextBox1.SelectionBackColor = Color.White;
 
-            // Получаем индекс первого символа нужной строки
+
             int lineStartPos = richTextBox1.GetFirstCharIndexFromLine(lineIdx);
             if (lineStartPos < 0) return;
-
-            // Вычисляем позиции
             int selectionStart = lineStartPos + startCol;
             int selectionLength = endCol - startCol;
 
-            // Дополнительная проверка границ, чтобы не "вылететь" за пределы текста
             if (selectionStart < 0) selectionStart = 0;
             if (selectionStart + selectionLength > richTextBox1.Text.Length)
                 selectionLength = richTextBox1.Text.Length - selectionStart;
 
-            // Фокусируемся и выделяем конкретный фрагмент
             richTextBox1.Focus();
             richTextBox1.Select(selectionStart, Math.Max(0, selectionLength));
             richTextBox1.SelectionBackColor = Color.LightCoral;
 
-            // Прокручиваем к месту ошибки
+
             richTextBox1.ScrollToCaret();
         }
 
