@@ -33,10 +33,9 @@ V_N = { <Start>, <CONDITION>, <EXPR>, <LOGIC_TERM>, <COMPARE>, <VALUE>, <LOGIC_O
 <img width="1063" height="818" alt="image" src="https://github.com/user-attachments/assets/70191a80-c131-4e34-9378-9c8c3300345b" />
 
 скрирны  
-<img width="955" height="584" alt="image" src="https://github.com/user-attachments/assets/a05a6120-95fb-4198-9ee9-54984027edab" />
-<img width="899" height="575" alt="image" src="https://github.com/user-attachments/assets/2e726a1d-5b25-487e-b012-8625d5af1011" />
+<img width="887" height="579" alt="image" src="https://github.com/user-attachments/assets/16954262-6032-4a37-b3a1-192e5c03d140" />
 
-<img width="1161" height="664" alt="image" src="https://github.com/user-attachments/assets/7618d17a-9805-45e0-acee-87a39a2d2274" />
-<img width="897" height="577" alt="image" src="https://github.com/user-attachments/assets/8220526b-f85c-471a-aa57-f19cbbbbad12" />
+<img width="884" height="575" alt="image" src="https://github.com/user-attachments/assets/5543681d-7abf-4906-8105-e6a3bb20e79d" />
+<img width="1066" height="582" alt="image" src="https://github.com/user-attachments/assets/b8e39812-809e-4370-ae57-c32e0e3b116a" />
 
 
