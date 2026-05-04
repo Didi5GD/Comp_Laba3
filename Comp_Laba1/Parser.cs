@@ -75,7 +75,7 @@ namespace Comp_Laba1
         {
             int pos = _currentPos;
             int i = 0;
-            while (IsValidToken() && i < 3)
+            while (IsValidToken() && i < 5)
             {
                 if (codes.Contains(_currentToken.Usl_code))
                 {
@@ -102,7 +102,7 @@ namespace Comp_Laba1
             }
             else
             {
-                if (_errorCounter > 3) { endFlag = true; return; }
+                if (_errorCounter > 5) { endFlag = true; return; }
                 
                 AddError($"После {_tokens[Math.Max(_currentPos - 1, 0)].Lecsema}", _tokens[_currentPos].Place, message);
                 SkipToSynchronizingToken(syncro);
@@ -119,7 +119,7 @@ namespace Comp_Laba1
         private bool SkipToToken(int[] neededCodes)
         {
             int i = 0;
-            while (IsValidToken() && i < 3)
+            while (IsValidToken() && i < 5)
             {
                 if (neededCodes.Contains(_currentToken.Usl_code))
                 {
@@ -162,88 +162,88 @@ namespace Comp_Laba1
           
 
             int[] codes = new int[] { 2 };
-            int[] syncro = new int[] { 2, 11, 1 };
+            int[] syncro = new int[] { 2, 11, 1, 13, 14, 15, 16, 19, 20, 1 };
             ExpectToken(codes, syncro, "Ожидается ключевое слово if");
 
             if (endFlag) return;
             codes = new int[] { 11 };
-            syncro = new int[] { 11, 1, 13, 14, 15, 16, 19, 20 };
+            syncro = new int[] { 11, 1, 13, 14, 15, 16, 19, 20, 1, 12 };
             ExpectToken(codes, syncro, "Ожидается (");
 
             if (endFlag) return;
             codes = new int[] { 1 };
-            syncro = new int[] { 1, 13, 14, 15, 16, 19, 20, 1 };
+            syncro = new int[] { 1, 13, 14, 15, 16, 19, 20, 1, 12, 9 };
             ExpectToken(codes, syncro, "Ожидается идентификатор");
 
             if (endFlag) return;
             codes = new int[] { 13, 14, 15, 16, 19, 20 };
-            syncro = new int[] { 13, 14, 15, 16, 19, 20, 1, 12 };
+            syncro = new int[] { 13, 14, 15, 16, 19, 20, 1, 12, 9, 1 };
             ExpectToken(codes, syncro, "Ожидается оператор сравнения");
 
             if (endFlag) return;
             codes = new int[] { 1 };
-            syncro = new int[] { 1, 12, 9 };
+            syncro = new int[] { 1, 12, 9, 1, 18 };
             ExpectToken(codes, syncro, "Ожидается идентификатор");
 
             if (endFlag) return;
             codes = new int[] { 12 };
-            syncro = new int[] { 12, 9, 1 };
+            syncro = new int[] { 12, 9, 1,18, 1 };
             ExpectToken(codes, syncro, "Ожидается )");
 
             if (endFlag) return;
             codes = new int[] { 9 };
-            syncro = new int[] { 9, 1, 18 };
+            syncro = new int[] { 9, 1, 18,1,17 };
             ExpectToken(codes, syncro, "Ожидается {");
 
 
             if (endFlag) return;
             codes = new int[] { 1 };
-            syncro = new int[] { 1, 18, 1 };
+            syncro = new int[] { 1, 18, 1,17,10 };
             ExpectToken(codes, syncro, "Ожидается идентификатор");
 
             if (endFlag) return;
             codes = new int[] { 18 };
-            syncro = new int[] { 18, 1, 17 };
+            syncro = new int[] { 18, 1, 17,10,3 };
             ExpectToken(codes, syncro, "Ожидается  =");
 
             if (endFlag) return;
             codes = new int[] { 1 };
-            syncro = new int[] { 1, 17, 10 };
+            syncro = new int[] { 1, 17, 10,3,9 };
             ExpectToken(codes, syncro, "Ожидается идентификатор");
 
             if (endFlag) return;
             codes = new int[] { 17 };
-            syncro = new int[] { 17, 10, 3 };
+            syncro = new int[] { 17, 10, 3,9,1 };
             ExpectToken(codes, syncro, "Ожидается ;");
 
             if (endFlag) return;
             codes = new int[] { 10 };
-            syncro = new int[] { 10, 3, 9 };
+            syncro = new int[] { 10, 3, 9,1,18 };
             ExpectToken(codes, syncro, "Ожидается }");
 
             if (endFlag) return;
             codes = new int[] { 3 };
-            syncro = new int[] { 3, 9, 1 };
+            syncro = new int[] { 3, 9, 1,18,1 };
             ExpectToken(codes, syncro, "Ожидается else");
 
             if (endFlag) return;
             codes = new int[] { 9 };
-            syncro = new int[] { 9, 1, 18 };
+            syncro = new int[] { 9, 1, 18 ,1,17};
             ExpectToken(codes, syncro, "Ожидается {");
 
             if (endFlag) return;
             codes = new int[] { 1 };
-            syncro = new int[] { 1, 18, 1 };
+            syncro = new int[] { 1, 18, 1,17,10 };
             ExpectToken(codes, syncro, "Ожидается идентификатор");
 
             if (endFlag) return;
             codes = new int[] { 18 };
-            syncro = new int[] { 18, 1, 17 };
+            syncro = new int[] { 18, 1, 17, 10,17 };
             ExpectToken(codes, syncro, "Ожидается  =");
 
             if (endFlag) return;
             codes = new int[] { 1 };
-            syncro = new int[] { 1, 17, 10 };
+            syncro = new int[] { 1, 17, 10,17 };
             ExpectToken(codes, syncro, "Ожидается идентификатор");
 
             if (endFlag) return;
