@@ -452,14 +452,18 @@ namespace Comp_Laba1
 
             try
             {
-                string place = dataGridView1.Rows[e.RowIndex].Cells["Place"].Value?.ToString();
-
+                string place = dataGridView1.Rows[e.RowIndex].Cells["Location"].Value?.ToString();
                 if (string.IsNullOrEmpty(place)) return;
-                var match = System.Text.RegularExpressions.Regex.Match(place, @"\((\d+),(\d+)\)");
+
+                var match = System.Text.RegularExpressions.Regex.Match(place, @"\((\d+),\s*(\d+)-(\d+)\)");
+
                 if (match.Success)
                 {
-                    int lineNumber = int.Parse(match.Groups[1].Value);
-                    HighlightLine(lineNumber);
+                    int line = int.Parse(match.Groups[1].Value);
+                    int start = int.Parse(match.Groups[2].Value);
+                    int end = int.Parse(match.Groups[3].Value);
+
+                    HighlightLine(line, start, end);
                 }
             }
             catch (Exception ex)
@@ -468,28 +472,37 @@ namespace Comp_Laba1
             }
         }
 
-        private void HighlightLine(int lineNumber)
-        {
-            if (richTextBox1 == null || richTextBox1.Lines.Length == 0) return;
 
-            string[] lines = richTextBox1.Lines;
-            if (lineNumber < 1 || lineNumber > lines.Length) return;
+        private void HighlightLine(int lineIdx, int startCol, int endCol)
+        {
+            // Защита: индекс строки не может быть отрицательным или больше количества строк
+            if (richTextBox1 == null || lineIdx < 0 || lineIdx >= richTextBox1.Lines.Length) return;
+
+            // Сброс старого выделения (чтобы не копились розовые пятна)
+            int currentCaret = richTextBox1.SelectionStart;
             richTextBox1.SelectAll();
             richTextBox1.SelectionBackColor = Color.White;
-            richTextBox1.SelectionColor = Color.Black;
-            int startPos = 0;
-            for (int i = 0; i < lineNumber - 1; i++)
-            {
-                startPos += lines[i].Length + 1;
-            }
 
-            int lineLength = lines[lineNumber - 1].Length;
-            int endPos = startPos + lineLength;
+            // Получаем индекс первого символа нужной строки
+            int lineStartPos = richTextBox1.GetFirstCharIndexFromLine(lineIdx);
+            if (lineStartPos < 0) return;
+
+            // Вычисляем позиции
+            int selectionStart = lineStartPos + startCol;
+            int selectionLength = endCol - startCol;
+
+            // Дополнительная проверка границ, чтобы не "вылететь" за пределы текста
+            if (selectionStart < 0) selectionStart = 0;
+            if (selectionStart + selectionLength > richTextBox1.Text.Length)
+                selectionLength = richTextBox1.Text.Length - selectionStart;
+
+            // Фокусируемся и выделяем конкретный фрагмент
             richTextBox1.Focus();
-            richTextBox1.Select(startPos, lineLength);
+            richTextBox1.Select(selectionStart, Math.Max(0, selectionLength));
             richTextBox1.SelectionBackColor = Color.LightCoral;
+
+            // Прокручиваем к месту ошибки
             richTextBox1.ScrollToCaret();
-            richTextBox1.Select(startPos, 0);
         }
 
 
@@ -740,12 +753,12 @@ namespace Comp_Laba1
             dataGridView1.Columns.Add("UslCode", "Код");
             dataGridView1.Columns.Add("Type", "Тип");
             dataGridView1.Columns.Add("Lecsema", "Лексема");
-            dataGridView1.Columns.Add("Place", "Позиция");
+            dataGridView1.Columns.Add("Location", "Позиция");
 
             dataGridView1.Columns["UslCode"].Width = 80;
             dataGridView1.Columns["Type"].Width = 120;
             dataGridView1.Columns["Lecsema"].Width = 150;
-            dataGridView1.Columns["Place"].Width = 100;
+            dataGridView1.Columns["Location"].Width = 100;
 
             foreach (var token in result_lecs)
             {
@@ -788,10 +801,10 @@ namespace Comp_Laba1
             dataGridView1.Rows.Clear();
             dataGridView1.Columns.Clear();
             dataGridView1.Columns.Add("Fragment", "Неверный фрагмент");
-            dataGridView1.Columns.Add("Place", "Местоположение");
+            dataGridView1.Columns.Add("Location", "Местоположение");
             dataGridView1.Columns.Add("Description", "Описание ошибки");
             dataGridView1.Columns["Fragment"].Width = 200;
-            dataGridView1.Columns["Place"].Width = 120;
+            dataGridView1.Columns["Location"].Width = 120;
             dataGridView1.Columns["Description"].Width = 200;
 
             foreach (var error in result_parser)

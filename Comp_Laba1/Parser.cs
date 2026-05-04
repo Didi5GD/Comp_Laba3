@@ -104,7 +104,7 @@ namespace Comp_Laba1
             {
                 if (_errorCounter > 5) { endFlag = true; return; }
                 
-                AddError($"После {_tokens[Math.Max(_currentPos - 1, 0)].Lecsema}", _tokens[_currentPos].Place, message);
+                AddError($"Около {_tokens[Math.Max(_currentPos - 1, 0)].Lecsema}", _tokens[Math.Max(_currentPos - 1, 0)].Place, message);
                 SkipToSynchronizingToken(syncro);
                 if (SkipToToken(codes))
                 {
@@ -136,7 +136,7 @@ namespace Comp_Laba1
         {
             if (!IsValidToken())
             {
-                AddError($"После {_tokens[Math.Max(_currentPos - 1, 0)].Lecsema}", _tokens[_currentPos-1].Place, message);
+                AddError($"После {_tokens[Math.Max(_currentPos - 1, 0)].Lecsema}", _tokens[Math.Max(_currentPos - 1, 0)].Place, message);
                 endFlag = true;
                 return;
             }

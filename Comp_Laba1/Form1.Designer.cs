@@ -460,9 +460,9 @@ namespace Comp_Laba1
             // 
             this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBox1.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.richTextBox1.Location = new System.Drawing.Point(50, 98);
+            this.richTextBox1.Location = new System.Drawing.Point(50, 95);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(908, 193);
+            this.richTextBox1.Size = new System.Drawing.Size(908, 196);
             this.richTextBox1.TabIndex = 3;
             this.richTextBox1.Text = "";
             this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
@@ -527,7 +527,7 @@ namespace Comp_Laba1
             this.file1ToolStripMenuItem});
             this.menuStrip3.Location = new System.Drawing.Point(0, 68);
             this.menuStrip3.Name = "menuStrip3";
-            this.menuStrip3.Size = new System.Drawing.Size(958, 30);
+            this.menuStrip3.Size = new System.Drawing.Size(958, 27);
             this.menuStrip3.TabIndex = 5;
             this.menuStrip3.Text = "menuStrip3";
             // 
@@ -544,9 +544,9 @@ namespace Comp_Laba1
             this.richTextBox2.Dock = System.Windows.Forms.DockStyle.Left;
             this.richTextBox2.Enabled = false;
             this.richTextBox2.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.richTextBox2.Location = new System.Drawing.Point(0, 98);
+            this.richTextBox2.Location = new System.Drawing.Point(0, 95);
             this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.Size = new System.Drawing.Size(50, 193);
+            this.richTextBox2.Size = new System.Drawing.Size(50, 196);
             this.richTextBox2.TabIndex = 6;
             this.richTextBox2.Text = "";
             this.richTextBox2.WordWrap = false;
